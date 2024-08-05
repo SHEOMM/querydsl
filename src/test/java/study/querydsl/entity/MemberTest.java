@@ -12,7 +12,6 @@ import org.springframework.test.annotation.Commit;
 
 @SpringBootTest
 @Transactional
-@Commit
 class MemberTest {
 
     @PersistenceContext
