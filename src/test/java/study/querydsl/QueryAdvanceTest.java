@@ -177,6 +177,31 @@ public class QueryAdvanceTest {
     private BooleanExpression usernameEq(String usernameCond) {
         return usernameCond != null ? member.username.eq(usernameCond) : null;
     }
+    // 위처럼 메소드 분리를 하면 조립이 가능하다.
+    // 쿼리 가독성이 높아진다.
+    // 또한 메소드 재활용도 가능하다.
+    // 단 조합 시 null 체크를 유의해야 한다.
+    private BooleanExpression allEq(String usernameCond, Integer ageCond){
+        return usernameEq(usernameCond).and(ageEq(ageCond));
+    }
 
+    // bulk 연산 주의사항 -> JPA의 영속성 컨텍스트와 불일치가 일어난다. bulk는 영속성 컨텍스트와 상관없이 DB에 즉시 값을 삽입하기 때문이다.
+    // 따라서 영속성 컨텍스트를 초기화 하는 것이 안전하다.
+    @Test
+    public void bulkUpdate(){
+        queryFactory
+                .update(member)
+                .set(member.username, "비회원")
+                .where(member.age.lt(28))
+                .execute();
+    }
+
+    @Test
+    public void bulkDelete(){
+        queryFactory
+                .delete(member)
+                .where(member.age.gt(18))
+                .execute();
+    }
 
 }
