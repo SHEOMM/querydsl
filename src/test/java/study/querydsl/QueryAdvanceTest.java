@@ -8,6 +8,7 @@ import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -187,6 +188,7 @@ public class QueryAdvanceTest {
 
     // bulk 연산 주의사항 -> JPA의 영속성 컨텍스트와 불일치가 일어난다. bulk는 영속성 컨텍스트와 상관없이 DB에 즉시 값을 삽입하기 때문이다.
     // 따라서 영속성 컨텍스트를 초기화 하는 것이 안전하다.
+    // em.flush(), em.clear();
     @Test
     public void bulkUpdate(){
         queryFactory
@@ -203,5 +205,20 @@ public class QueryAdvanceTest {
                 .where(member.age.gt(18))
                 .execute();
     }
+
+    @Test
+    public void sqlFunction(){
+        List<String> fetch = queryFactory
+                .select(Expressions.stringTemplate("function('replace', {0}, {1}, {2})",
+                        member.username, "member", "M"))
+                .from(member)
+                .fetch();
+        for (String s : fetch) {
+            System.out.println("s = " + s);
+        }
+
+    }
+
+
 
 }
